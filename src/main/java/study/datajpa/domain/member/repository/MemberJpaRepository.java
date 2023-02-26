@@ -1,9 +1,9 @@
-package study.datajpa.repository;
+package study.datajpa.domain.member.repository;
 
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-import study.datajpa.entity.Member;
+import study.datajpa.domain.member.entity.Member;
 
 @Repository
 @RequiredArgsConstructor
