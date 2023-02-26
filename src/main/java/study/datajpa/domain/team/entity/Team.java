@@ -1,4 +1,4 @@
-package study.datajpa.domain.team;
+package study.datajpa.domain.team.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
