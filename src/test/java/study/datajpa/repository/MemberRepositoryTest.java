@@ -5,8 +5,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
+import study.datajpa.domain.member.dto.MemberDto;
 import study.datajpa.domain.member.entity.Member;
 import study.datajpa.domain.member.repository.MemberRepository;
+import study.datajpa.domain.team.entity.Team;
+import study.datajpa.domain.team.respository.TeamRepository;
 
 
 import java.util.List;
@@ -19,6 +22,9 @@ class MemberRepositoryTest {
 
     @Autowired
     MemberRepository memberRepository;
+
+    @Autowired
+    TeamRepository teamRepository;
 
     @Test
     @Rollback(value = false)
@@ -118,5 +124,46 @@ class MemberRepositoryTest {
 
         //then
         assertThat(member1).isEqualTo(ret.get(0));
+    }
+
+    @Test
+    public void testFindUserName() throws Exception {
+        //given
+        Member member = new Member("AAA", 10);
+        Member member1 = new Member("BBB", 20);
+        Member member2 = new Member("hoon", 20);
+
+        memberRepository.save(member);
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+
+        //when
+        List<String> userNameList = memberRepository.findUserNameList();
+
+        //then
+        for (String s : userNameList) {
+            System.out.println("s = " + s);
+        }
+    }
+
+    @Test
+    public void testFindMemberDto() throws Exception {
+        //given
+        Team team = new Team("teamA");
+
+        Member member = new Member("hoon", 29);
+
+        teamRepository.save(team);
+
+        member.changeTeam(team);
+        memberRepository.save(member);
+        //when
+
+        List<MemberDto> memberDto = memberRepository.findMemberDto();
+        //then
+        MemberDto findMemberDto = memberDto.get(0);
+        assertThat(findMemberDto.getId()).isEqualTo(member.getId());
+        assertThat(findMemberDto.getTeamName()).isEqualTo(member.getTeam().getTeamName());
+        assertThat(findMemberDto.getUserName()).isEqualTo(member.getUserName());
     }
 }
