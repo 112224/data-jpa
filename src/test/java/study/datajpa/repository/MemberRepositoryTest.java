@@ -14,6 +14,7 @@ import study.datajpa.domain.team.respository.TeamRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -189,5 +190,16 @@ class MemberRepositoryTest {
         for (Member byName : byNames) {
             System.out.println("byName = " + byName);
         }
+    }
+
+    @Test
+    public void testReturnType() throws Exception {
+        //given
+        Member member = new Member("hoon", 29);
+        //when
+        Optional<Member> hoon = memberRepository.findOptionalByUserName("hoon");
+
+        //then
+        System.out.println("hoon = " + hoon);
     }
 }
