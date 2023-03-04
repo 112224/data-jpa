@@ -12,6 +12,7 @@ import study.datajpa.domain.team.entity.Team;
 import study.datajpa.domain.team.respository.TeamRepository;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -27,7 +28,6 @@ class MemberRepositoryTest {
     TeamRepository teamRepository;
 
     @Test
-    @Rollback(value = false)
     public void testMember() {
 
         Member member = new Member("hoon");
@@ -165,5 +165,29 @@ class MemberRepositoryTest {
         assertThat(findMemberDto.getId()).isEqualTo(member.getId());
         assertThat(findMemberDto.getTeamName()).isEqualTo(member.getTeam().getTeamName());
         assertThat(findMemberDto.getUserName()).isEqualTo(member.getUserName());
+    }
+
+    @Test
+    public void testFindByNames() throws Exception {
+        //given
+        Member member = new Member("hoon", 29);
+        Member member1 = new Member("dana", 29);
+        Member member2 = new Member("hh", 29);
+
+        memberRepository.save(member);
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+
+        //when
+        List<String> names = new ArrayList<>();
+        names.add("hoon");
+        names.add("dana");
+        names.add("hh");
+        List<Member> byNames = memberRepository.findByNames(names);
+
+        //then
+        for (Member byName : byNames) {
+            System.out.println("byName = " + byName);
+        }
     }
 }
