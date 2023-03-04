@@ -1,13 +1,12 @@
 package study.datajpa.repository;
 
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import study.datajpa.domain.member.dto.MemberDto;
 import study.datajpa.domain.member.entity.Member;
@@ -15,12 +14,10 @@ import study.datajpa.domain.member.repository.MemberRepository;
 import study.datajpa.domain.team.entity.Team;
 import study.datajpa.domain.team.respository.TeamRepository;
 
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -32,6 +29,9 @@ class MemberRepositoryTest {
 
     @Autowired
     TeamRepository teamRepository;
+
+    @Autowired
+    EntityManager em;
 
     @Test
     public void testMember() {
@@ -253,5 +253,35 @@ class MemberRepositoryTest {
         for (Member member : members) {
             System.out.println("member = " + member);
         }
+    }
+
+    @Test
+    public void testFindMemberLazy() throws Exception {
+        //given
+        Team teamA = new Team("teamA");
+        Team teamB = new Team("teamB");
+
+        teamRepository.save(teamA);
+        teamRepository.save(teamB);
+
+        Member member1 = new Member("hoon", 10, teamA);
+        Member member2 = new Member("dana", 20, teamB);
+
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+
+        em.flush();
+        em.clear();
+
+        //when
+        List<Member> members = memberRepository.findFetchByUserName("hoon");
+
+        for (Member member : members) {
+            System.out.println("member = " + member);
+            System.out.println("member.getTeam().getClass() = " + member.getTeam().getClass());
+            System.out.println("member.getTeam().getTeamName() = " + member.getTeam().getTeamName());
+
+        }
+        //then
     }
 }
