@@ -3,6 +3,10 @@ package study.datajpa.repository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import study.datajpa.domain.member.dto.MemberDto;
@@ -16,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -201,5 +206,52 @@ class MemberRepositoryTest {
 
         //then
         System.out.println("hoon = " + hoon);
+    }
+
+    @Test
+    public void pageTest() throws Exception {
+        //given
+        memberRepository.save(new Member("member1", 10));
+        memberRepository.save(new Member("member2", 10));
+        memberRepository.save(new Member("member3", 10));
+        memberRepository.save(new Member("member4", 10));
+        memberRepository.save(new Member("member5", 10));
+
+
+        int age = 10;
+        PageRequest pageRequest = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "userName"));
+        //when
+        Page<Member> memberPage = memberRepository.findByAge(age, pageRequest);
+
+        //then
+        List<Member> content = memberPage.getContent();
+
+        assertThat(content.size()).isEqualTo(3);
+        assertThat(memberPage.getTotalElements()).isEqualTo(5);
+        assertThat(memberPage.getNumber()).isEqualTo(0);
+        assertThat(memberPage.getTotalPages()).isEqualTo(2);
+        assertThat(memberPage.isFirst()).isTrue();
+        assertThat(memberPage.hasNext()).isTrue();
+
+    }
+
+    @Test
+    public void testBulkUpdate() throws Exception {
+        //given
+        memberRepository.save(new Member("member1", 11));
+        memberRepository.save(new Member("member2", 20));
+        memberRepository.save(new Member("member3", 30));
+        memberRepository.save(new Member("member4", 50));
+        memberRepository.save(new Member("member5", 21));
+        //when
+
+        int result = memberRepository.bulkAgePlus(20);
+
+        //then
+        assertThat(result).isEqualTo(4);
+        List<Member> members = memberRepository.findAll();
+        for (Member member : members) {
+            System.out.println("member = " + member);
+        }
     }
 }
