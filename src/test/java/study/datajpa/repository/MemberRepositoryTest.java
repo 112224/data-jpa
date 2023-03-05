@@ -317,4 +317,16 @@ class MemberRepositoryTest {
         em.flush();
         //then
     }
+
+    @Test
+    public void testFindMemberCustom() throws Exception {
+        //given
+        memberRepository.save(new Member("hoon", 29));
+        //when
+        List<Member> memberCustom = memberRepository.findMemberCustom();
+        //then
+        for (Member member : memberCustom) {
+            System.out.println("member = " + member);
+        }
+    }
 }
