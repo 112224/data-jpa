@@ -8,6 +8,7 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import study.datajpa.domain.team.entity.Team;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @SpringBootTest
@@ -49,6 +50,32 @@ class MemberTest {
             System.out.println("member = " + member.getTeam());
         }
         //then
+    }
+
+    @Test
+    @Rollback(value = false)
+    public void testJpaEventBaseEntity() throws Exception {
+        //given
+        Member member = new Member("hoon", 29);
+
+        em.persist(member);
+        Thread.sleep(1000);
+
+        member.changeUserName("dana");
+
+        em.flush();
+        em.clear();
+        //when
+
+        Member member1 = em.createQuery("select m from Member m where m.id = :id", Member.class)
+                .setParameter("id", member.getId())
+                .getSingleResult();
+
+
+        //then
+        System.out.println("member1 = " + member1);
+        System.out.println("member1.getCreatedDate() = " + member1.getCreatedDate());
+        System.out.println("member1.getLastModifiedDate() = " + member1.getLastModifiedDate());
     }
 
 }

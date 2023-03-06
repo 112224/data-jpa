@@ -5,6 +5,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import study.datajpa.domain.common.entity.BaseEntity;
+import study.datajpa.domain.common.entity.JpaBaseEntity;
 import study.datajpa.domain.team.entity.Team;
 
 @Entity
@@ -15,7 +17,7 @@ import study.datajpa.domain.team.entity.Team;
         name = "Member.findByUserName",
         query = "select m from Member m where m.userName =: userName"
 )
-public class Member {
+public class Member extends BaseEntity {
 
     @Id
     @GeneratedValue
