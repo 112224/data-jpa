@@ -4,9 +4,7 @@ import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.Transactional;
 import study.datajpa.domain.member.dto.MemberDto;
@@ -355,5 +353,34 @@ class MemberRepositoryTest {
         //then
 
         assertThat(members.size()).isEqualTo(1);
+    }
+
+    @Test
+    public void queryByExample() throws Exception {
+        Team team = new Team("teamA");
+        em.persist(team);
+
+        Member member1 = new Member("m1", 10, team);
+        Member member2 = new Member("m2", 10, team);
+
+        em.persist(member1);
+        em.persist(member2);
+
+        em.flush();
+        em.clear();
+
+        //when
+        //Probe
+        Member member = new Member("m1");
+        member.changeTeam(team);
+
+        ExampleMatcher matcher = ExampleMatcher.matching().withIgnorePaths("age");
+        Example<Member> example = Example.of(member, matcher);
+
+        List<Member> members = memberRepository.findAll(example);
+
+        //then
+
+        assertThat(members.get(0).getUserName()).isEqualTo("m1");
     }
 }
