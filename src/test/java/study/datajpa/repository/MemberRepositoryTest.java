@@ -7,10 +7,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.Transactional;
 import study.datajpa.domain.member.dto.MemberDto;
 import study.datajpa.domain.member.entity.Member;
 import study.datajpa.domain.member.repository.MemberRepository;
+import study.datajpa.domain.member.repository.MemberSpec;
 import study.datajpa.domain.team.entity.Team;
 import study.datajpa.domain.team.respository.TeamRepository;
 
@@ -328,5 +330,30 @@ class MemberRepositoryTest {
         for (Member member : memberCustom) {
             System.out.println("member = " + member);
         }
+    }
+
+    @Test
+    public void specBasic() throws Exception {
+        //given
+        Team team = new Team("teamA");
+        em.persist(team);
+
+        Member member1 = new Member("m1", 10, team);
+        Member member2 = new Member("m2", 10, team);
+
+        em.persist(member1);
+        em.persist(member2);
+
+        em.flush();
+        em.clear();
+
+        //when
+
+        Specification<Member> spec = MemberSpec.userName("m1").and(MemberSpec.teamName("teamA"));
+        List<Member> members = memberRepository.findAll(spec);
+
+        //then
+
+        assertThat(members.size()).isEqualTo(1);
     }
 }
