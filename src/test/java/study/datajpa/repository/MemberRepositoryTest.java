@@ -9,8 +9,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.Transactional;
 import study.datajpa.domain.member.dto.MemberDto;
 import study.datajpa.domain.member.entity.Member;
-import study.datajpa.domain.member.repository.MemberRepository;
-import study.datajpa.domain.member.repository.MemberSpec;
+import study.datajpa.domain.member.repository.*;
 import study.datajpa.domain.team.entity.Team;
 import study.datajpa.domain.team.respository.TeamRepository;
 
@@ -382,5 +381,29 @@ class MemberRepositoryTest {
         //then
 
         assertThat(members.get(0).getUserName()).isEqualTo("m1");
+    }
+
+    @Test
+    public void projections() throws Exception {
+        //given
+        Team team = new Team("teamA");
+        em.persist(team);
+
+        Member member1 = new Member("m1", 10, team);
+        Member member2 = new Member("m2", 10, team);
+
+        em.persist(member1);
+        em.persist(member2);
+
+        em.flush();
+        em.clear();
+        //when
+
+        List<NestedClosedProjections> result = memberRepository.findProjectionsByUserName("m1", NestedClosedProjections.class);
+        for (NestedClosedProjections userNameOnly : result) {
+            System.out.println("userNameOnly = " + userNameOnly);
+        }
+
+        //then
     }
 }
