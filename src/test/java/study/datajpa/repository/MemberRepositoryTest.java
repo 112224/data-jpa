@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import study.datajpa.domain.member.dto.MemberDto;
 import study.datajpa.domain.member.entity.Member;
@@ -402,6 +403,32 @@ class MemberRepositoryTest {
         List<NestedClosedProjections> result = memberRepository.findProjectionsByUserName("m1", NestedClosedProjections.class);
         for (NestedClosedProjections userNameOnly : result) {
             System.out.println("userNameOnly = " + userNameOnly);
+        }
+
+        //then
+    }
+
+    @Test
+    public void nativeQueryTest() throws Exception {
+        //given
+        Team team = new Team("teamA");
+        em.persist(team);
+
+        Member member1 = new Member("m1", 10, team);
+        Member member2 = new Member("m2", 10, team);
+
+        em.persist(member1);
+        em.persist(member2);
+
+        em.flush();
+        em.clear();
+        //when
+
+        Page<MemberProjection> page = memberRepository.findByNativeProjection(PageRequest.of(0, 10));
+        List<MemberProjection> content = page.getContent();
+        for (MemberProjection memberProjection : content) {
+            System.out.println("memberProjection.getUserName() = " + memberProjection.getUserName());
+            System.out.println("memberProjection.getTeamName() = " + memberProjection.getTeamName());
         }
 
         //then
